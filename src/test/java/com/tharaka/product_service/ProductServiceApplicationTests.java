@@ -1,8 +1,6 @@
 package com.tharaka.product_service;
 
 import io.restassured.RestAssured;
-import io.restassured.matcher.ResponseAwareMatcher;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,44 +8,45 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Import;
 import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.shaded.org.hamcrest.Matchers;
 
 @Import(TestcontainersConfiguration.class)
-@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ProductServiceApplicationTests {
 
-	@ServiceConnection
-	static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0.5");
-	@LocalServerPort
-	private int port;
+    @ServiceConnection
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0.5");
 
-	@BeforeEach
-	void setUp() {
-		RestAssured.baseURI = "http://localhost";
-		RestAssured.port = port;
-	}
+    static {
+        mongoDBContainer.start();
+    }
 
-	static {
-		mongoDBContainer.start();
-	}
-	@Test
-	void shouldCreateProduct() {
-		String requestBody = """
-				{
-				  "name": "iPhone 15 Pro",
-				  "description": "Latest Apple smartphone with A17 Pro chip and titanium design",
-				  "price": 999.99
-				}
-				""";
-		RestAssured.given()
-				.contentType("application/json")
-				.body(requestBody)
-				.when()
-				.post("/api/product")
-				.then()
-				.statusCode(201)
-				.body("id", org.hamcrest.Matchers.notNullValue())
-				.body("name", org.hamcrest.Matchers.equalTo("iPhone 15 Pro"));
-	}
+    @LocalServerPort
+    private int port;
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.baseURI = "http://localhost";
+        RestAssured.port = port;
+    }
+
+    @Test
+    void shouldCreateProduct() {
+        String requestBody = """
+                {
+                  "name": "iPhone 15 Pro",
+                  "description": "Latest Apple smartphone with A17 Pro chip and titanium design",
+                  "price": 999.99
+                }
+                """;
+        RestAssured.given()
+                .contentType("application/json")
+                .body(requestBody)
+                .when()
+                .post("/api/product")
+                .then()
+                .statusCode(201)
+                .body("id", org.hamcrest.Matchers.notNullValue())
+                .body("name", org.hamcrest.Matchers.equalTo("iPhone 15 Pro"));
+    }
 
 }
