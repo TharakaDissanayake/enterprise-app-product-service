@@ -28,6 +28,7 @@ replay_pid*
 *.iml
 out/
 target/
+data/
 
 # Maven / Gradle build folders
 build/
